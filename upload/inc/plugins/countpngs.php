@@ -26,9 +26,13 @@
       0. You just DO WHAT THE FUCK YOU WANT TO.
 ****************************************************************************/
 
-if(!defined("IN_MYBB"))
+if(!defined("IN_MYBB")){
 	die("This file cannot be accessed directly.");
+}
 
+if(!defined("PROSTATS")){
+    define("PROSTATS", MYBB_ROOT."inc/plugins/prostats.php");
+}
 // add hooks
 $plugins->add_hook('admin_load', 'countpngs_admin');
 $plugins->add_hook('admin_tools_menu', 'countpngs_admin_tools_menu');
