@@ -30,10 +30,7 @@ if(!defined("IN_MYBB")){
 	die("This file cannot be accessed directly.");
 
 // add hooks
-$plugins->add_hook('admin_load', 'countpngs_admin');
-$plugins->add_hook('admin_tools_menu', 'countpngs_admin_tools_menu');
-$plugins->add_hook('admin_tools_action_handler', 'countpngs_admin_tools_action_handler');
-$plugins->add_hook('admin_tools_permissions', 'countpngs_admin_permissions');
+$plugins->add_hook('admin_config_settings_change', ['countpngs', 'admin_config_settings_change']);
 
 function countpngs_info()
 {
@@ -54,17 +51,130 @@ function countpngs_info()
 function countpngs_install()
 {
 
-	$template = '<strong>{$counterpngs}</strong>';
+	global $mybb, $db;
 
-	$insert_array = array(
-		'title' => 'counterpngs_template',
-		'template' => $db->escape_string($template),
-		'sid' => '-1',
-		'version' => '',
-		'dateline' => time()
-	);
+    // settings
+	$settingGroupId = $db->insert_query('settinggroups', [
+		'name'        => 'countpngs',
+		'title'       => 'CountPNGs',
+		'description' => 'Settings for CountPNGs.',
+	]);
 	
-	$db->insert_query('templates', $insert_array);
+	$settings = [
+		// start numbers
+		[
+			'name'        => 'png_zero',
+			'title'       => '0.png/gif',
+			'description' => 'Path to the image for number 0. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/0.png',
+		],
+		[
+			'name'        => 'png_one',
+			'title'       => '1.png/gif',
+			'description' => 'Path to the image for number 1. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/1.png',
+		],
+		[
+			'name'        => 'png_two',
+			'title'       => '2.png/gif',
+			'description' => 'Path to the image for number 2. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/2.png',
+		],
+		[
+			'name'        => 'png_three',
+			'title'       => '3.png/gif',
+			'description' => 'Path to the image for number 3. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/3.png',
+		],
+		[
+			'name'        => 'png_four',
+			'title'       => '4.png/gif',
+			'description' => 'Path to the image for number 4. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/4.png',
+		],
+		[
+			'name'        => 'png_five',
+			'title'       => '5.png/gif',
+			'description' => 'Path to the image for number 5. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/5.png',
+		],
+		[
+			'name'        => 'png_six',
+			'title'       => '6.png/gif',
+			'description' => 'Path to the image for number 6. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/6.png',
+		],
+		[
+			'name'        => 'png_seven',
+			'title'       => '7.png/gif',
+			'description' => 'Path to the image for number 7. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/7.png',
+		],
+		[
+			'name'        => 'png_eight',
+			'title'       => '8.png/gif',
+			'description' => 'Path to the image for number 8. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/8.png',
+		],
+		[
+			'name'        => 'png_nine',
+			'title'       => '9.png/gif',
+			'description' => 'Path to the image for number 9. Must be at images/counter.',
+			'optionscode' => 'text',
+			'value'       => 'minecraft/j/9.png',
+		],
+        // end numbers
+		// options: yesno, numeric, text, select
+
+		$i = 1;
+	
+		foreach ($settings as &$row) {
+			$row['gid']         = $settingGroupId;
+			$row['title']       = $db->escape_string($row['title']);
+			$row['description'] = $db->escape_string($row['description']);
+			$row['disporder']   = $i++;
+		}
+	
+		$db->insert_query_multiple('settings', $settings);
+	
+		rebuild_settings();
+	
+    // templates
+    $templates = [
+        'countpngs_main' => '<div class="panel">
+<label for="countercat">Category:</label>
+<select name="countercat" id="countercat">
+    <optgroup label="====== Total ======">
+		<option value="numposts">Posts</option>
+		<option value="numthreads">Threads</option>
+		<option value="numusers">Users</option>
+	</optgroup>
+	<optgroup label="====== Per Day ======">
+		<option value="postsperday">Posts</option>
+		<option value="threadsperday">Threads</option>
+		<option value="membersperday">Users</option>
+	</optgroup>
+	<optgroup label="====== Average ======">
+		<option value="postspermember">Posts per user</option>
+		<option value="threadspermember">Threads per member</option>
+		<option value="repliesperthread">Replies per thread</option>
+	</optgroup>
+	<optgroup label="==================="></optgroup>
+</select>'
+	];
+
+}
+
+$db->insert_query_multiple('templates', $data);
 }
 
 function countpngs_is_installed()
