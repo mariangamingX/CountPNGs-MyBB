@@ -6,7 +6,7 @@
  *
  *  License: license.txt
  *
- *  Count someone's posts since a certain date
+ *  Fully customizable counter based on images for MyBB 1.8.
  *
  ***************************************************************************/
 
